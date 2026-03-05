@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-zinc-200 p-8"
@@ -41,8 +41,8 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-1 font-sans">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -52,8 +52,8 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-1 font-sans">Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -63,7 +63,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="p-3 rounded-lg bg-red-50 text-red-600 text-sm font-medium font-sans"
@@ -72,7 +72,7 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          <button 
+          <button
             type="submit"
             disabled={isSubmitting}
             className="w-full bg-zinc-900 text-white font-semibold py-2.5 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 font-sans"
@@ -81,7 +81,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        </div>
       </motion.div>
     </div>
   );
