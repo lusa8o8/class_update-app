@@ -1,0 +1,5 @@
+{
+  "name": "Catch-Up Certainty System",
+  "description": "A role-based auth system for students and admins using Supabase for real-time updates and data persistence.",
+  "requestFramePermissions": []
+}
