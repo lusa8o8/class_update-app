@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
-import bcrypt from 'bcryptjs';
+import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -11,23 +10,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { email, password } = req.body;
 
   try {
-    const db = getDb();
-    const { data: user, error } = await db.from('users').select('*').eq('email', email).single();
+    // Step 1: Authenticate against Supabase Auth
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-    if (error || !user || !bcrypt.compareSync(password, user.password)) {
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError || !authData.user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Step 2: Fetch role and name from public.users
+    const { data: userRow, error: userError } = await supabase
+      .from('users')
+      .select('id, email, full_name, role')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (userError || !userRow) {
+      return res.status(401).json({ error: 'Account not configured. Contact admin.' });
+    }
+
+    // Step 3: Issue JWT with role
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: userRow.id, email: userRow.email, role: userRow.role },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    res.setHeader('Set-Cookie', `auth_token=${token}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${24 * 60 * 60}`);
+    res.setHeader(
+      'Set-Cookie',
+      `auth_token=${token}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${24 * 60 * 60}`
+    );
 
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({ user: userWithoutPassword });
+    res.json({ user: userRow });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
