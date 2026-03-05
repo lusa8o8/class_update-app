@@ -47,7 +47,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all font-sans"
-              placeholder="admin@example.com"
+              placeholder="you@university.ac.zm"
             />
           </div>
           <div>
@@ -81,15 +81,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-zinc-100 text-center space-y-4">
-          <p className="text-sm text-zinc-500">
-            Don't have an account? <a href="/register" className="text-zinc-900 font-bold hover:underline">Create one</a>
-          </p>
-          <p className="text-[10px] text-zinc-400 font-mono leading-relaxed">
-            Demo Credentials:<br/>
-            Admin: admin@example.com / admin123<br/>
-            Student: student@example.com / student123
-          </p>
         </div>
       </motion.div>
     </div>
