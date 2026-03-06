@@ -51,7 +51,7 @@ export default function App({ Component, pageProps }: AppProps) {
     const data = await res.json();
     if (res.ok) {
       setUser(data.user);
-      router.push(data.user.role === 'admin' ? '/admin' : '/student');
+      router.replace(data.user.role === 'admin' ? '/admin' : '/student');
     } else {
       throw new Error(data.error || 'Login failed');
     }
