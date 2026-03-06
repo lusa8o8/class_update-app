@@ -34,14 +34,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (error) throw error;
 
     // Get caught up status for this student
-    const { data: caughtUpStatus, error: caughtUpError } = await db.from('caught_up_status')
+    const { data: caughtUpStatus, error: caughtUpError } = await db.from('caught_up')
       .select('session_id')
-      .eq('student_id', user.id)
-      .eq('caught_up', true);
+      .eq('student_id', user.id);
 
     if (caughtUpError) throw caughtUpError;
 
-    const caughtUpSessionIds = new Set(caughtUpStatus.map(s => s.session_id));
+    const caughtUpSessionIds = new Set((caughtUpStatus || []).map((s: any) => s.session_id));
 
     const formattedCourses = enrollments.map((e: any) => {
       const course = e.course;
@@ -57,8 +56,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.json(formattedCourses);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ error: 'Failed to fetch your courses' });
+    return res.status(500).json({
+      error: 'Failed to fetch your courses',
+      detail: error?.message || String(error),
+      code: error?.code
+    });
   }
 }
