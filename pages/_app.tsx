@@ -42,6 +42,19 @@ export default function App({ Component, pageProps }: AppProps) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (!loading && user) {
+      const handlePopState = () => {
+        const path = window.location.pathname;
+        if (path === '/login' || path === '/') {
+          router.replace(user.role === 'admin' ? '/admin' : '/student');
+        }
+      };
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }
+  }, [user, loading]);
+
   const login = async (email: string, password: string) => {
     const res = await fetch('/api/login', {
       method: 'POST',
