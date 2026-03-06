@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public paths
-  if (pathname === '/login' || pathname.startsWith('/api/')) {
+  if (pathname === '/login' || pathname === '/waitlist' || pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
