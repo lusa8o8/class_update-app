@@ -28,7 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { error } = await db.from('attendance').upsert({
       student_id: user.id,
       session_id: sessionId,
-      status
+      status,
+      marked_at: new Date().toISOString()
     }, { onConflict: 'student_id, session_id' });
 
     if (error) throw error;
