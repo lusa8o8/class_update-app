@@ -1,27 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
-import getDb, { getServiceDb } from '../../lib/db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = req.cookies.auth_token;
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  if (!token) return res.status(200).json({ user: null });
 
   try {
+    const payload = jwt.verify(token, JWT_SECRET) as any;
     const db = getServiceDb();
-    const decoded: any = jwt.verify(token, JWT_SECRET);
-    const { data: user, error } = await db.from('users')
-      .select('id, email, role, institution, school, phone, country')
-      .eq('id', decoded.id)
+
+    const { data: user, error } = await db
+      .from('users')
+      .select('id, email, full_name, role')
+      .eq('id', payload.id)
       .single();
 
-    if (error || !user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json({ user });
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
+    if (error || !user) return res.status(200).json({ user: null });
+    return res.status(200).json({ user });
+  } catch {
+    return res.status(200).json({ user: null });
   }
 }
