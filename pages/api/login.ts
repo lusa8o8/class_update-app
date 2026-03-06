@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -25,8 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Step 2: Fetch role and name from public.users
-    const { data: userRow, error: userError } = await supabase
+    // Step 2: Fetch role and name from public.users using Service Role Client
+    const serviceDb = getServiceDb();
+    const { data: userRow, error: userError } = await serviceDb
       .from('users')
       .select('id, email, full_name, role')
       .eq('id', authData.user.id)

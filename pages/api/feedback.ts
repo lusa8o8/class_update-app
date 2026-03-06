@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
+import getDb, { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const db = getDb();
+  const db = getServiceDb();
 
   if (req.method === 'GET') {
     if (user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { data: feedback, error } = await db.from('feedback')
         .select(`
           *,
-          student:users (email, phone)
+          users!student_id (email, full_name)
         `)
         .order('created_at', { ascending: false });
 
@@ -32,8 +32,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Format the results to match the previous structure
       const formattedFeedback = feedback.map((f: any) => ({
         ...f,
-        student_email: f.student?.email,
-        student_phone: f.student?.phone
+        student_email: f.users?.email,
+        student_phone: f.users?.phone || 'N/A', // Using N/A if phone is missing
+        student_name: f.users?.full_name
       }));
 
       return res.json(formattedFeedback);

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
+import getDb, { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const db = getDb();
+  const db = getServiceDb();
 
   if (req.method === 'GET') {
     const { courseId } = req.query;
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .eq('student_id', user.id)
           .eq('course_id', courseId)
           .single();
-        
+
         if (enrollError || !enrollment) return res.status(403).json({ error: 'Not enrolled in this course' });
       }
 
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const formattedSessions = sessions.map((s: any) => {
         const userAttendance = s.attendance?.find((a: any) => a.student_id === user.id);
         const userCaughtUp = s.caught_up_status?.find((cs: any) => cs.student_id === user.id);
-        
+
         const { attendance, caught_up_status, ...rest } = s;
         return {
           ...rest,

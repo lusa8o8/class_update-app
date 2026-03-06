@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
+import getDb, { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const db = getDb();
+  const db = getServiceDb();
   if (user.role !== 'student') return res.status(403).json({ error: 'Only students can mark attendance' });
 
   const { sessionId, status } = req.body;

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../../lib/db';
+import getDb, { getServiceDb } from '../../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const db = getDb();
+    const db = getServiceDb();
     const startDate = new Date(start_date);
     let currentSessionNum = parseInt(start_session_num);
     const inserts: any[] = [];

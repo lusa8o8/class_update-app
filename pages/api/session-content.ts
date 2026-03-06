@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
+import getDb, { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  const db = getDb();
+  const db = getServiceDb();
   const { sessionId } = req.query;
 
   if (req.method === 'GET') {
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select('*')
         .eq('session_id', sessionId)
         .single();
-      
+
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
       return res.json(data || null);
     } catch (error) {

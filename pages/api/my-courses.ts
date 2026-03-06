@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import getDb from '../../lib/db';
+import getDb, { getServiceDb } from '../../lib/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'catch-up-certainty-secret-key';
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const db = getDb();
+    const db = getServiceDb();
     const { data: enrollments, error } = await db.from('enrollments')
       .select(`
         enrolled_at,
@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const formattedCourses = enrollments.map((e: any) => {
       const course = e.course;
       const sessions = course.sessions || [];
-      
+
       return {
         ...course,
         enrolled_at: e.enrolled_at,
