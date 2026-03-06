@@ -33,11 +33,11 @@ export default function AdminDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
-  
+
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
   const [isCreatingUpdate, setIsCreatingUpdate] = useState(false);
   const [editingContentUpdate, setEditingContentUpdate] = useState<Update | null>(null);
-  
+
   const [feedback, setFeedback] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'courses' | 'feedback'>('courses');
 
@@ -45,11 +45,11 @@ export default function AdminDashboard() {
   const [bulkWeeks, setBulkWeeks] = useState(4);
   const [bulkDays, setBulkDays] = useState<number[]>([]);
   const [bulkStartDate, setBulkStartDate] = useState('');
-  
+
   const [newName, setNewName] = useState('');
   const [newCode, setNewCode] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  
+
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateNum, setUpdateNum] = useState(1);
   const [updateDate, setUpdateDate] = useState('');
@@ -59,7 +59,10 @@ export default function AdminDashboard() {
   const [keyPoints, setKeyPoints] = useState<string[]>([]);
   const [files, setFiles] = useState<{ name: string; url: string }[]>([]);
   const [assessmentReminder, setAssessmentReminder] = useState('');
-  
+
+  const [studentProgress, setStudentProgress] = useState<any[]>([]);
+  const [loadingProgress, setLoadingProgress] = useState(false);
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -72,6 +75,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (selectedCourse) {
       fetchUpdates(selectedCourse.id);
+      fetchProgress(selectedCourse.id);
     }
   }, [selectedCourse]);
 
@@ -104,6 +108,19 @@ export default function AdminDashboard() {
       if (res.ok) setUpdates(data);
     } catch (err) {
       console.error('Failed to fetch updates');
+    }
+  };
+
+  const fetchProgress = async (courseId: number) => {
+    setLoadingProgress(true);
+    try {
+      const res = await fetch(`/api/course-progress?courseId=${courseId}`);
+      const data = await res.json();
+      if (res.ok) setStudentProgress(data);
+    } catch (err) {
+      console.error('Failed to fetch student progress');
+    } finally {
+      setLoadingProgress(false);
     }
   };
 
@@ -186,11 +203,11 @@ export default function AdminDashboard() {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          course_id: selectedCourse.id, 
-          session_number: updateNum, 
-          title: updateTitle, 
-          date: updateDate 
+        body: JSON.stringify({
+          course_id: selectedCourse.id,
+          session_number: updateNum,
+          title: updateTitle,
+          date: updateDate
         }),
       });
       if (res.ok) {
@@ -233,7 +250,7 @@ export default function AdminDashboard() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setIsUploading(true);
     // Simulate upload
     setTimeout(() => {
@@ -270,15 +287,15 @@ export default function AdminDashboard() {
             </div>
             <span className="font-semibold text-zinc-900 tracking-tight">Admin Portal</span>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-6">
-            <button 
+            <button
               onClick={() => setActiveTab('courses')}
               className={`flex items-center gap-2 text-sm font-medium transition-colors ${activeTab === 'courses' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
             >
               <LayoutDashboard size={18} /> Courses
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('feedback')}
               className={`flex items-center gap-2 text-sm font-medium transition-colors ${activeTab === 'feedback' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
             >
@@ -296,7 +313,7 @@ export default function AdminDashboard() {
           </button>
         </div>
       </nav>
-      
+
       <div className="max-w-7xl mx-auto p-6 sm:p-8">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -304,23 +321,23 @@ export default function AdminDashboard() {
               {activeTab === 'feedback' ? 'Student Feedback' : (selectedCourse ? selectedCourse.name : 'Course Management')}
             </h1>
             <p className="text-zinc-500 mt-1 text-sm">
-              {activeTab === 'feedback' 
+              {activeTab === 'feedback'
                 ? 'Review suggestions and feature requests from your students.'
-                : (selectedCourse 
-                  ? `Managing updates for ${selectedCourse.code}` 
+                : (selectedCourse
+                  ? `Managing updates for ${selectedCourse.code}`
                   : 'Create and manage academic courses and student enrollments.')}
             </p>
           </div>
           <div className="flex gap-3">
             {activeTab === 'courses' && selectedCourse && (
               <>
-                <button 
+                <button
                   onClick={() => setIsBulkCreating(true)}
                   className="flex items-center gap-2 bg-white border border-zinc-200 text-zinc-600 px-4 py-2.5 rounded-xl font-medium hover:bg-zinc-50 transition-all"
                 >
                   <Repeat size={18} /> Bulk Add
                 </button>
-                <button 
+                <button
                   onClick={() => setIsCreatingUpdate(true)}
                   className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-all"
                 >
@@ -329,7 +346,7 @@ export default function AdminDashboard() {
               </>
             )}
             {activeTab === 'courses' && !selectedCourse && (
-              <button 
+              <button
                 onClick={() => setIsCreatingCourse(true)}
                 className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-all"
               >
@@ -337,7 +354,7 @@ export default function AdminDashboard() {
               </button>
             )}
             {selectedCourse && (
-              <button 
+              <button
                 onClick={() => setSelectedCourse(null)}
                 className="px-4 py-2.5 rounded-xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
               >
@@ -349,13 +366,13 @@ export default function AdminDashboard() {
 
         <AnimatePresence>
           {isBulkCreating && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-md"
             >
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="bg-white rounded-3xl shadow-2xl border border-zinc-200 w-full max-w-md overflow-hidden"
@@ -366,24 +383,24 @@ export default function AdminDashboard() {
                     <XCircle size={20} />
                   </button>
                 </div>
-                
+
                 <form onSubmit={handleBulkCreate} className="p-6 space-y-6">
                   <div>
                     <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">Start Date</label>
-                    <input 
+                    <input
                       required
-                      type="date" 
+                      type="date"
                       value={bulkStartDate}
                       onChange={e => setBulkStartDate(e.target.value)}
                       className="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">Duration (Weeks)</label>
-                    <input 
+                    <input
                       required
-                      type="number" 
+                      type="number"
                       min="1"
                       max="12"
                       value={bulkWeeks}
@@ -406,19 +423,18 @@ export default function AdminDashboard() {
                               setBulkDays([...bulkDays, i]);
                             }
                           }}
-                          className={`py-2 rounded-xl text-xs font-bold transition-all border ${
-                            bulkDays.includes(i) 
-                              ? 'bg-zinc-900 text-white border-zinc-900' 
-                              : 'bg-white text-zinc-400 border-zinc-200 hover:border-zinc-300'
-                          }`}
+                          className={`py-2 rounded-xl text-xs font-bold transition-all border ${bulkDays.includes(i)
+                            ? 'bg-zinc-900 text-white border-zinc-900'
+                            : 'bg-white text-zinc-400 border-zinc-200 hover:border-zinc-300'
+                            }`}
                         >
                           {day}
                         </button>
                       ))}
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     type="submit"
                     className="w-full bg-zinc-900 text-white py-4 rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20"
                   >
@@ -432,7 +448,7 @@ export default function AdminDashboard() {
 
         <AnimatePresence>
           {isCreatingCourse && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -443,8 +459,8 @@ export default function AdminDashboard() {
                 <form onSubmit={handleCreateCourse} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Course Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
                       value={newName}
                       onChange={e => setNewName(e.target.value)}
@@ -454,8 +470,8 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Course Code</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
                       value={newCode}
                       onChange={e => setNewCode(e.target.value)}
@@ -465,7 +481,7 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Description</label>
-                    <textarea 
+                    <textarea
                       value={newDesc}
                       onChange={e => setNewDesc(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all h-24 resize-none"
@@ -474,14 +490,14 @@ export default function AdminDashboard() {
                   </div>
                   {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
                   <div className="flex gap-3 pt-2">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setIsCreatingCourse(false)}
                       className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
                       className="flex-1 bg-zinc-900 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-colors"
                     >
@@ -494,7 +510,7 @@ export default function AdminDashboard() {
           )}
 
           {isCreatingUpdate && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -506,8 +522,8 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-4 gap-4">
                     <div className="col-span-1">
                       <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">#</label>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         required
                         value={updateNum}
                         onChange={e => setUpdateNum(parseInt(e.target.value))}
@@ -516,8 +532,8 @@ export default function AdminDashboard() {
                     </div>
                     <div className="col-span-3">
                       <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Update Title</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={updateTitle}
                         onChange={e => setUpdateTitle(e.target.value)}
@@ -528,8 +544,8 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Date</label>
-                    <input 
-                      type="datetime-local" 
+                    <input
+                      type="datetime-local"
                       required
                       value={updateDate}
                       onChange={e => setUpdateDate(e.target.value)}
@@ -538,14 +554,14 @@ export default function AdminDashboard() {
                   </div>
                   {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
                   <div className="flex gap-3 pt-2">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setIsCreatingUpdate(false)}
                       className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
                       className="flex-1 bg-zinc-900 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-colors"
                     >
@@ -558,7 +574,7 @@ export default function AdminDashboard() {
           )}
 
           {editingContentUpdate && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -574,13 +590,13 @@ export default function AdminDashboard() {
                     <X size={20} />
                   </button>
                 </div>
-                
+
                 <div className="p-8 overflow-y-auto space-y-8">
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                       <FileText size={14} /> Summary
                     </label>
-                    <textarea 
+                    <textarea
                       value={summary}
                       onChange={e => setSummary(e.target.value)}
                       className="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all h-32 resize-none text-sm leading-relaxed"
@@ -595,7 +611,7 @@ export default function AdminDashboard() {
                     <div className="space-y-2">
                       {keyPoints.map((point, i) => (
                         <div key={i} className="flex gap-2">
-                          <input 
+                          <input
                             value={point}
                             onChange={e => {
                               const newPoints = [...keyPoints];
@@ -605,7 +621,7 @@ export default function AdminDashboard() {
                             className="flex-1 px-4 py-2 rounded-xl border border-zinc-200 text-sm"
                             placeholder={`Point ${i + 1}`}
                           />
-                          <button 
+                          <button
                             onClick={() => setKeyPoints(keyPoints.filter((_, idx) => idx !== i))}
                             className="p-2 text-zinc-400 hover:text-red-500"
                           >
@@ -613,7 +629,7 @@ export default function AdminDashboard() {
                           </button>
                         </div>
                       ))}
-                      <button 
+                      <button
                         onClick={() => setKeyPoints([...keyPoints, ''])}
                         className="text-xs font-bold text-zinc-900 hover:underline flex items-center gap-1"
                       >
@@ -626,7 +642,7 @@ export default function AdminDashboard() {
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                       <AlertCircle size={14} /> Assessment Reminder
                     </label>
-                    <input 
+                    <input
                       value={assessmentReminder}
                       onChange={e => setAssessmentReminder(e.target.value)}
                       className="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm"
@@ -655,7 +671,7 @@ export default function AdminDashboard() {
                       <div className="space-y-2">
                         {files.map((file, i) => (
                           <div key={i} className="flex gap-2">
-                            <input 
+                            <input
                               value={file.name}
                               onChange={e => {
                                 const newFiles = [...files];
@@ -665,7 +681,7 @@ export default function AdminDashboard() {
                               className="flex-1 px-4 py-2 rounded-xl border border-zinc-200 text-sm"
                               placeholder="File Name"
                             />
-                            <input 
+                            <input
                               value={file.url}
                               onChange={e => {
                                 const newFiles = [...files];
@@ -675,7 +691,7 @@ export default function AdminDashboard() {
                               className="flex-1 px-4 py-2 rounded-xl border border-zinc-200 text-sm"
                               placeholder="URL"
                             />
-                            <button 
+                            <button
                               onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
                               className="p-2 text-zinc-400 hover:text-red-500"
                             >
@@ -689,13 +705,13 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex gap-3">
-                  <button 
+                  <button
                     onClick={() => setEditingContentUpdate(null)}
                     className="flex-1 px-4 py-3 rounded-2xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
                   >
                     Discard Changes
                   </button>
-                  <button 
+                  <button
                     onClick={handleSaveContent}
                     className="flex-1 bg-zinc-900 text-white px-4 py-3 rounded-2xl font-medium hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
                   >
@@ -719,16 +735,15 @@ export default function AdminDashboard() {
                 <div key={item.id} className="bg-white p-6 rounded-3xl border border-zinc-200 shadow-sm">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        item.type === 'suggestion' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
-                      }`}>
+                      <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${item.type === 'suggestion' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                        }`}>
                         {item.type}
                       </div>
                       <span className="text-sm font-medium text-zinc-900">{item.student_email}</span>
                       {item.student_phone && (
-                        <a 
-                          href={`https://wa.me/${item.student_phone.replace(/\D/g, '')}`} 
-                          target="_blank" 
+                        <a
+                          href={`https://wa.me/${item.student_phone.replace(/\D/g, '')}`}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full transition-colors"
                         >
@@ -758,9 +773,9 @@ export default function AdminDashboard() {
               </div>
             ) : (
               courses.map(course => (
-                <motion.div 
+                <motion.div
                   layout
-                  key={course.id} 
+                  key={course.id}
                   onClick={() => {
                     setSelectedCourse(course);
                     setUpdateNum(1); // Reset update num for next creation
@@ -775,7 +790,7 @@ export default function AdminDashboard() {
                   </div>
                   <h3 className="font-bold text-zinc-900 text-lg mb-2 group-hover:text-zinc-700 transition-colors">{course.name}</h3>
                   <p className="text-zinc-500 text-sm line-clamp-2 mb-6 h-10">{course.description || 'No description provided.'}</p>
-                  
+
                   <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-zinc-600">
                       <Users size={16} />
@@ -789,6 +804,71 @@ export default function AdminDashboard() {
                 </motion.div>
               ))
             )}
+
+            <section className="mt-16">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-zinc-900 flex items-center gap-2">
+                  <Users className="text-zinc-400" size={20} />
+                  Student Progress
+                </h2>
+                <span className="bg-zinc-100 text-zinc-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                  {studentProgress.length} Enrolled
+                </span>
+              </div>
+
+              <div className="bg-white rounded-3xl border border-zinc-200 overflow-hidden shadow-sm">
+                {loadingProgress ? (
+                  <div className="p-12 text-center animate-pulse">
+                    <div className="h-4 w-32 bg-zinc-100 mx-auto rounded mb-2"></div>
+                    <div className="h-3 w-48 bg-zinc-50 mx-auto rounded"></div>
+                  </div>
+                ) : studentProgress.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <p className="text-zinc-500">No students enrolled in this course yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-zinc-50/50 border-b border-zinc-100">
+                          <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Student</th>
+                          <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center">Caught Up</th>
+                          <th className="px-6 py-4 text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">Enrolled At</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-50">
+                        {studentProgress.map((student: any) => (
+                          <tr key={student.student_id} className="hover:bg-zinc-50/30 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="font-bold text-zinc-900 text-sm">{student.full_name || 'No Name'}</div>
+                              <div className="text-zinc-500 text-xs">{student.email}</div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex flex-col items-center">
+                                <div className="text-sm font-bold text-zinc-900">
+                                  {student.caught_up} / {student.total_completed}
+                                </div>
+                                <div className="w-24 h-1.5 bg-zinc-100 rounded-full mt-1.5 overflow-hidden">
+                                  <div
+                                    className="h-full bg-emerald-500 transition-all duration-500"
+                                    style={{ width: `${student.total_completed > 0 ? (student.caught_up / student.total_completed) * 100 : 0}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <span className="text-xs text-zinc-400">
+                                {new Date(student.enrolled_at).toLocaleDateString()}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
         ) : (
           <div className="space-y-4">
@@ -800,7 +880,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
               updates.map(update => (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={update.id}
@@ -817,18 +897,17 @@ export default function AdminDashboard() {
                           <Calendar size={12} />
                           {new Date(update.date).toLocaleString()}
                         </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                          update.status === 'completed' 
-                            ? 'bg-emerald-50 text-emerald-600' 
-                            : 'bg-amber-50 text-amber-600'
-                        }`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${update.status === 'completed'
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'bg-amber-50 text-amber-600'
+                          }`}>
                           {update.status}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingContentUpdate(update);
                         fetchUpdateContent(update.id);
@@ -837,13 +916,12 @@ export default function AdminDashboard() {
                     >
                       <FileText size={16} /> Content
                     </button>
-                    <button 
+                    <button
                       onClick={() => toggleUpdateStatus(update)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                        update.status === 'completed'
-                          ? 'text-zinc-400 hover:text-zinc-600'
-                          : 'bg-zinc-900 text-white hover:bg-zinc-800'
-                      }`}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${update.status === 'completed'
+                        ? 'text-zinc-400 hover:text-zinc-600'
+                        : 'bg-zinc-900 text-white hover:bg-zinc-800'
+                        }`}
                     >
                       {update.status === 'completed' ? (
                         <><Circle size={16} /> Mark as Upcoming</>
