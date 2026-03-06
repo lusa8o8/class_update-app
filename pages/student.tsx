@@ -100,8 +100,8 @@ export default function StudentDashboard() {
       if (res.ok && data) {
         setUpdateContent({
           summary: data.summary,
-          key_points: JSON.parse(data.key_points || '[]'),
-          files: JSON.parse(data.files || '[]'),
+          key_points: Array.isArray(data.key_points) ? data.key_points : JSON.parse(data.key_points || '[]'),
+          files: Array.isArray(data.files) ? data.files : JSON.parse(data.files || '[]'),
           assessment_reminder: data.assessment_reminder
         });
       } else {
