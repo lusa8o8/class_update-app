@@ -41,11 +41,11 @@ export default function StudentDashboard() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [viewingUpdate, setViewingUpdate] = useState<Update | null>(null);
   const [updateContent, setUpdateContent] = useState<UpdateContent | null>(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [enrollingId, setEnrollingId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'suggestion' | 'request'>('suggestion');
   const [feedbackContent, setFeedbackContent] = useState('');
@@ -70,10 +70,10 @@ export default function StudentDashboard() {
         fetch('/api/courses'),
         fetch('/api/my-courses')
       ]);
-      
+
       const allData = await allRes.json();
       const myData = await myRes.json();
-      
+
       if (allRes.ok) setAvailableCourses(allData);
       if (myRes.ok) setMyCourses(myData);
     } catch (err) {
@@ -133,20 +133,7 @@ export default function StudentDashboard() {
     }
   };
 
-  const markAttendance = async (sessionId: number, status: 'attended' | 'missed') => {
-    try {
-      const res = await fetch('/api/attendance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, status }),
-      });
-      if (res.ok) {
-        setUpdates(updates.map(u => u.id === sessionId ? { ...u, attendance_status: status } : u));
-      }
-    } catch (err) {
-      console.error('Failed to mark attendance');
-    }
-  };
+
 
   const markCaughtUp = async (sessionId: number) => {
     try {
@@ -197,8 +184,8 @@ export default function StudentDashboard() {
     return myCourses.some(c => c.id === courseId);
   };
 
-  const filteredCourses = availableCourses.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredCourses = availableCourses.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -214,7 +201,7 @@ export default function StudentDashboard() {
           <span className="font-semibold text-zinc-900 tracking-tight">Student Portal</span>
         </div>
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => setIsFeedbackModalOpen(true)}
             className="flex items-center gap-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors bg-zinc-100 px-3 py-1.5 rounded-lg"
           >
@@ -226,7 +213,7 @@ export default function StudentDashboard() {
           </button>
         </div>
       </nav>
-      
+
       <div className="max-w-7xl mx-auto p-6 sm:p-8">
         <header className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -261,7 +248,7 @@ export default function StudentDashboard() {
             </div>
           </div>
           {selectedCourse && (
-            <button 
+            <button
               onClick={() => setSelectedCourse(null)}
               className="px-4 py-2.5 rounded-xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
             >
@@ -272,13 +259,13 @@ export default function StudentDashboard() {
 
         <AnimatePresence>
           {isFeedbackModalOpen && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-md"
             >
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="bg-white rounded-3xl shadow-2xl border border-zinc-200 w-full max-w-md overflow-hidden"
@@ -289,7 +276,7 @@ export default function StudentDashboard() {
                     <XCircle size={20} />
                   </button>
                 </div>
-                
+
                 <form onSubmit={handleSubmitFeedback} className="p-6 space-y-4">
                   {feedbackSuccess ? (
                     <div className="py-8 text-center space-y-3">
@@ -304,34 +291,32 @@ export default function StudentDashboard() {
                       <div>
                         <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">Feedback Type</label>
                         <div className="grid grid-cols-2 gap-2">
-                          <button 
+                          <button
                             type="button"
                             onClick={() => setFeedbackType('suggestion')}
-                            className={`py-2 px-4 rounded-xl text-sm font-medium border transition-all ${
-                              feedbackType === 'suggestion' 
-                                ? 'bg-zinc-900 text-white border-zinc-900' 
-                                : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300'
-                            }`}
+                            className={`py-2 px-4 rounded-xl text-sm font-medium border transition-all ${feedbackType === 'suggestion'
+                              ? 'bg-zinc-900 text-white border-zinc-900'
+                              : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300'
+                              }`}
                           >
                             Suggestion
                           </button>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => setFeedbackType('request')}
-                            className={`py-2 px-4 rounded-xl text-sm font-medium border transition-all ${
-                              feedbackType === 'request' 
-                                ? 'bg-zinc-900 text-white border-zinc-900' 
-                                : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300'
-                            }`}
+                            className={`py-2 px-4 rounded-xl text-sm font-medium border transition-all ${feedbackType === 'request'
+                              ? 'bg-zinc-900 text-white border-zinc-900'
+                              : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300'
+                              }`}
                           >
                             Feature Request
                           </button>
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 block">Your Message</label>
-                        <textarea 
+                        <textarea
                           required
                           value={feedbackContent}
                           onChange={e => setFeedbackContent(e.target.value)}
@@ -340,8 +325,8 @@ export default function StudentDashboard() {
                           className="w-full px-4 py-3 rounded-2xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm resize-none"
                         />
                       </div>
-                      
-                      <button 
+
+                      <button
                         type="submit"
                         disabled={isSubmittingFeedback}
                         className="w-full bg-zinc-900 text-white py-3 rounded-2xl font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
@@ -362,7 +347,7 @@ export default function StudentDashboard() {
 
         <AnimatePresence>
           {viewingUpdate && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -378,7 +363,7 @@ export default function StudentDashboard() {
                     <XCircle size={20} />
                   </button>
                 </div>
-                
+
                 <div className="p-8 overflow-y-auto space-y-8">
                   {updateContent ? (
                     <>
@@ -418,10 +403,10 @@ export default function StudentDashboard() {
                           <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Resources</h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {updateContent.files.map((file, i) => (
-                              <a 
-                                key={i} 
-                                href={file.url} 
-                                target="_blank" 
+                              <a
+                                key={i}
+                                href={file.url}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-3 p-3 rounded-xl border border-zinc-100 hover:border-zinc-300 hover:bg-zinc-50 transition-all group"
                               >
@@ -444,7 +429,7 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex flex-col sm:flex-row gap-3">
-                  <button 
+                  <button
                     onClick={() => setViewingUpdate(null)}
                     className="flex-1 px-4 py-3 rounded-2xl border border-zinc-200 font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
                   >
@@ -455,7 +440,7 @@ export default function StudentDashboard() {
                       <CheckCircle2 size={20} /> Caught Up
                     </div>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => markCaughtUp(viewingUpdate.id)}
                       className="flex-1 bg-zinc-900 text-white px-4 py-3 rounded-2xl font-bold hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-zinc-900/20 active:scale-95"
                     >
@@ -480,7 +465,7 @@ export default function StudentDashboard() {
                   {myCourses.length} ACTIVE
                 </span>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
                   Array(2).fill(0).map((_, i) => (
@@ -492,9 +477,9 @@ export default function StudentDashboard() {
                   </div>
                 ) : (
                   myCourses.map(course => (
-                    <motion.div 
+                    <motion.div
                       layout
-                      key={course.id} 
+                      key={course.id}
                       onClick={() => setSelectedCourse(course)}
                       className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm relative overflow-hidden group cursor-pointer hover:border-zinc-300 transition-all active:scale-[0.98]"
                     >
@@ -503,7 +488,7 @@ export default function StudentDashboard() {
                       </div>
                       <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">{course.code}</div>
                       <h3 className="font-bold text-zinc-900 text-lg mb-4">{course.name}</h3>
-                      
+
                       {/* Progress Bar */}
                       {course.total_updates !== undefined && course.total_updates > 0 && (
                         <div className="mb-6">
@@ -514,7 +499,7 @@ export default function StudentDashboard() {
                             </span>
                           </div>
                           <div className="h-2 bg-zinc-100 rounded-full overflow-hidden border border-zinc-200/50">
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${(course.caught_up_updates! / course.total_updates!) * 100}%` }}
                               transition={{ duration: 1, ease: "easeOut" }}
@@ -547,8 +532,8 @@ export default function StudentDashboard() {
                 </h2>
                 <div className="relative w-full sm:w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Search courses..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
@@ -568,21 +553,21 @@ export default function StudentDashboard() {
                   </div>
                 ) : (
                   filteredCourses.map(course => (
-                    <motion.div 
+                    <motion.div
                       layout
-                      key={course.id} 
+                      key={course.id}
                       className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex flex-col hover:border-zinc-300 transition-colors"
                     >
                       <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">{course.code}</div>
                       <h3 className="font-bold text-zinc-900 text-lg mb-2">{course.name}</h3>
                       <p className="text-zinc-500 text-sm line-clamp-2 mb-6 flex-grow">{course.description || 'No description available.'}</p>
-                      
+
                       {isEnrolled(course.id) ? (
                         <div className="w-full py-2.5 rounded-xl bg-zinc-50 text-zinc-400 font-medium text-center text-sm flex items-center justify-center gap-2">
                           <CheckCircle size={16} /> Already Enrolled
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => handleEnroll(course.id)}
                           disabled={enrollingId === course.id}
                           className="w-full py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-colors disabled:opacity-50 active:scale-95"
@@ -606,7 +591,7 @@ export default function StudentDashboard() {
               </div>
             ) : (
               updates.map(update => (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={update.id}
@@ -630,19 +615,18 @@ export default function StudentDashboard() {
                           <Calendar size={12} />
                           {new Date(update.date).toLocaleString()}
                         </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                          update.status === 'completed' 
-                            ? 'bg-emerald-50 text-emerald-600' 
-                            : 'bg-amber-50 text-amber-600'
-                        }`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${update.status === 'completed'
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'bg-amber-50 text-amber-600'
+                          }`}>
                           {update.status}
                         </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         setViewingUpdate(update);
                         fetchUpdateContent(update.id);
@@ -651,31 +635,6 @@ export default function StudentDashboard() {
                     >
                       <FileText size={16} /> View Update
                     </button>
-                    
-                    {update.attendance_status === 'attended' ? (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 text-sm font-bold">
-                        <CheckCircle2 size={16} /> Attended
-                      </div>
-                    ) : update.attendance_status === 'missed' ? (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-sm font-bold">
-                        <XCircle size={16} /> Missed
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => markAttendance(update.id, 'attended')}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition-all active:scale-95"
-                        >
-                          <CheckCircle2 size={16} /> Attended
-                        </button>
-                        <button 
-                          onClick={() => markAttendance(update.id, 'missed')}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 text-zinc-600 text-sm font-medium hover:bg-zinc-50 transition-all active:scale-95"
-                        >
-                          <XCircle size={16} /> Missed
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </motion.div>
               ))
