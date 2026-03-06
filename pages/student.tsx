@@ -595,22 +595,22 @@ export default function StudentDashboard() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={update.id}
-                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex items-center justify-between group"
+                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-0 group"
                 >
-                  <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
+                  <div className="flex items-start lg:items-center gap-4 lg:gap-6">
+                    <div className="w-12 h-12 shrink-0 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
                       {update.session_number}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-bold text-zinc-900">{update.title}</h3>
                         {update.caught_up && (
-                          <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                          <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 whitespace-nowrap">
                             <CheckCircle2 size={10} /> CAUGHT UP
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 mt-1">
+                      <div className="flex flex-wrap items-center gap-3 mt-1">
                         <span className="text-xs text-zinc-400 flex items-center gap-1">
                           <Calendar size={12} />
                           {new Date(update.date).toLocaleString()}
@@ -625,13 +625,13 @@ export default function StudentDashboard() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full lg:w-auto">
                     <button
                       onClick={() => {
                         setViewingUpdate(update);
                         fetchUpdateContent(update.id);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm font-medium hover:bg-zinc-200 transition-all"
+                      className="flex flex-1 lg:flex-none justify-center items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm font-medium hover:bg-zinc-200 transition-all"
                     >
                       <FileText size={16} /> View Update
                     </button>
