@@ -804,6 +804,70 @@ export default function AdminDashboard() {
                 </motion.div>
               ))
             )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {updates.length === 0 ? (
+              <div className="bg-white border border-dashed border-zinc-300 rounded-2xl p-12 text-center">
+                <Calendar className="mx-auto text-zinc-300 mb-4" size={48} />
+                <h3 className="text-lg font-semibold text-zinc-900">No updates scheduled</h3>
+                <p className="text-zinc-500 mt-1">Add your first class update for this course.</p>
+              </div>
+            ) : (
+              updates.map(update => (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={update.id}
+                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
+                      {update.session_number}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-zinc-900">{update.title}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-zinc-400 flex items-center gap-1">
+                          <Calendar size={12} />
+                          {new Date(update.date).toLocaleString()}
+                        </span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${update.status === 'completed'
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'bg-amber-50 text-amber-600'
+                          }`}>
+                          {update.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingContentUpdate(update);
+                        fetchUpdateContent(update.id);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-all"
+                    >
+                      <FileText size={16} /> Content
+                    </button>
+                    <button
+                      onClick={() => toggleUpdateStatus(update)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${update.status === 'completed'
+                        ? 'text-zinc-400 hover:text-zinc-600'
+                        : 'bg-zinc-900 text-white hover:bg-zinc-800'
+                        }`}
+                    >
+                      {update.status === 'completed' ? (
+                        <><Circle size={16} /> Mark as Upcoming</>
+                      ) : (
+                        <><CheckCircle2 size={16} /> Mark Completed</>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            )}
 
             <section className="mt-16">
               <div className="flex items-center justify-between mb-6">
@@ -869,70 +933,6 @@ export default function AdminDashboard() {
                 )}
               </div>
             </section>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {updates.length === 0 ? (
-              <div className="bg-white border border-dashed border-zinc-300 rounded-2xl p-12 text-center">
-                <Calendar className="mx-auto text-zinc-300 mb-4" size={48} />
-                <h3 className="text-lg font-semibold text-zinc-900">No updates scheduled</h3>
-                <p className="text-zinc-500 mt-1">Add your first class update for this course.</p>
-              </div>
-            ) : (
-              updates.map(update => (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  key={update.id}
-                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
-                      {update.session_number}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-zinc-900">{update.title}</h3>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-zinc-400 flex items-center gap-1">
-                          <Calendar size={12} />
-                          {new Date(update.date).toLocaleString()}
-                        </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${update.status === 'completed'
-                          ? 'bg-emerald-50 text-emerald-600'
-                          : 'bg-amber-50 text-amber-600'
-                          }`}>
-                          {update.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingContentUpdate(update);
-                        fetchUpdateContent(update.id);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-all"
-                    >
-                      <FileText size={16} /> Content
-                    </button>
-                    <button
-                      onClick={() => toggleUpdateStatus(update)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${update.status === 'completed'
-                        ? 'text-zinc-400 hover:text-zinc-600'
-                        : 'bg-zinc-900 text-white hover:bg-zinc-800'
-                        }`}
-                    >
-                      {update.status === 'completed' ? (
-                        <><Circle size={16} /> Mark as Upcoming</>
-                      ) : (
-                        <><CheckCircle2 size={16} /> Mark Completed</>
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              ))
-            )}
           </div>
         )}
       </div>
