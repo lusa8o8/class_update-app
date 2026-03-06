@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // If student, check if enrolled
       if (user.role === 'student') {
         const { data: enrollment, error: enrollError } = await db.from('enrollments')
-          .select('1')
+          .select('id')
           .eq('student_id', user.id)
           .eq('course_id', courseId)
           .single();
