@@ -43,7 +43,7 @@ export default function WaitlistPage() {
         return (
             <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6">
                 <Head>
-                    <title>CatchUp - Join the Waitlist</title>
+                    <title>CatchUp — Join the Waitlist</title>
                 </Head>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -51,7 +51,15 @@ export default function WaitlistPage() {
                     className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-zinc-200 p-12 text-center"
                 >
                     <h2 className="text-2xl font-bold text-zinc-900 mb-2">You're on the list.</h2>
-                    <p className="text-zinc-500">We'll be in touch.</p>
+                    <p className="text-zinc-500 mb-6">We'll be in touch.</p>
+                    <a
+                        href="https://whatsapp.com/channel/0029Vb7KJmTDzgTAu7YXO10Z"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 font-medium hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                    >
+                        Join our WhatsApp channel for updates
+                    </a>
                 </motion.div>
             </div>
         );
@@ -60,7 +68,7 @@ export default function WaitlistPage() {
     return (
         <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6 py-12">
             <Head>
-                <title>CatchUp - Waitlist</title>
+                <title>CatchUp — Join the Waitlist</title>
             </Head>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -71,6 +79,12 @@ export default function WaitlistPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-zinc-900 mb-2 font-sans">CatchUp</h1>
                     <p className="text-lg font-semibold text-zinc-800 mb-1">Never fall behind again.</p>
                     <p className="text-zinc-500 text-sm">Miss class. Stay in sync. Join the waitlist for early access.</p>
+                    <p className="text-zinc-600 text-sm mt-4 leading-relaxed font-sans">
+                        CatchUp is a structured catch-up system for university students.
+                        When you miss a class, you get a clear summary of what was covered,
+                        what's due, and where you are in the syllabus — so you can get back
+                        on track without the anxiety.
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
