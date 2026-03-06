@@ -23,6 +23,9 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jose.jwtVerify(token, JWT_SECRET);
     const role = payload.role as string;
 
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL(role === 'admin' ? '/admin' : '/student', request.url));
+    }
     if (pathname.startsWith('/admin') && role !== 'admin') {
       return NextResponse.redirect(new URL('/student', request.url));
     }
