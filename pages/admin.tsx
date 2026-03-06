@@ -819,15 +819,15 @@ export default function AdminDashboard() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={update.id}
-                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex items-center justify-between group"
+                  className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-0 group"
                 >
-                  <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
+                  <div className="flex items-start lg:items-center gap-4 lg:gap-6">
+                    <div className="w-12 h-12 shrink-0 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900 font-bold text-lg">
                       {update.session_number}
                     </div>
                     <div>
                       <h3 className="font-bold text-zinc-900">{update.title}</h3>
-                      <div className="flex items-center gap-3 mt-1">
+                      <div className="flex flex-wrap items-center gap-3 mt-1">
                         <span className="text-xs text-zinc-400 flex items-center gap-1">
                           <Calendar size={12} />
                           {new Date(update.date).toLocaleString()}
@@ -841,20 +841,20 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap sm:flex-col md:flex-row items-stretch md:items-center gap-2 w-full lg:w-auto">
                     <button
                       onClick={() => {
                         setEditingContentUpdate(update);
                         fetchUpdateContent(update.id);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-all"
+                      className="flex justify-center items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-all flex-1 md:flex-none"
                     >
                       <FileText size={16} /> Content
                     </button>
                     <button
                       onClick={() => toggleUpdateStatus(update)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${update.status === 'completed'
-                        ? 'text-zinc-400 hover:text-zinc-600'
+                      className={`flex justify-center items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all flex-1 md:flex-none ${update.status === 'completed'
+                        ? 'text-zinc-400 hover:text-zinc-600 border border-transparent'
                         : 'bg-zinc-900 text-white hover:bg-zinc-800'
                         }`}
                     >
