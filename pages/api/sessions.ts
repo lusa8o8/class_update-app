@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select(`
           *,
           attendance!left (status, student_id),
-          caught_up_status!left (caught_up, caught_up_at, student_id)
+          caught_up!left (caught_up_at, student_id)
         `)
         .eq('course_id', courseId)
         .order('session_number', { ascending: true });
@@ -47,13 +47,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Filter and format the results to only include the current user's attendance and caught up status
       const formattedSessions = sessions.map((s: any) => {
         const userAttendance = s.attendance?.find((a: any) => a.student_id === user.id);
-        const userCaughtUp = s.caught_up_status?.find((cs: any) => cs.student_id === user.id);
-
-        const { attendance, caught_up_status, ...rest } = s;
+        const userCaughtUp = s.caught_up?.find((cs: any) => cs.student_id === user.id);
+        const { attendance, caught_up, ...rest } = s;
         return {
           ...rest,
           attendance_status: userAttendance?.status || null,
-          caught_up: userCaughtUp?.caught_up || false,
+          caught_up: !!userCaughtUp,
           caught_up_at: userCaughtUp?.caught_up_at || null
         };
       });

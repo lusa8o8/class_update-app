@@ -24,17 +24,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!sessionId) return res.status(400).json({ error: 'Update ID is required' });
 
   try {
-    const { error } = await db.from('caught_up_status').upsert({
+    const { error } = await db.from('caught_up').upsert({
       student_id: user.id,
       session_id: sessionId,
-      caught_up: true,
       caught_up_at: new Date().toISOString()
     }, { onConflict: 'student_id, session_id' });
 
     if (error) throw error;
     return res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ error: 'Failed to mark caught up' });
+    return res.status(500).json({
+      error: 'Failed to mark caught up',
+      detail: error?.message || String(error),
+      code: error?.code
+    });
   }
 }
